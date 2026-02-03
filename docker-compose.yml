@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    container_name: primetrade-backend
+    ports:
+      - "5000:5000"
+    environment:
+      NODE_ENV: production
+      PORT: 5000
+      MONGODB_URI: ${MONGODB_URI}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRE: ${JWT_EXPIRE}
+      UPSTASH_REDIS_URL: ${UPSTASH_REDIS_URL}
+    networks:
+      - primetrade-network
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    container_name: primetrade-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      REACT_APP_API_URL: http://localhost:5000/api/v1
+    depends_on:
+      - backend
+    networks:
+      - primetrade-network
+    restart: unless-stopped
+
+networks:
+  primetrade-network:
+    driver: bridge
